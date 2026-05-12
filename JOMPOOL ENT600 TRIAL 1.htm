@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    const firebaseConfig = {
+  apiKey: "ISI_API_KEY_KAU",
+  authDomain: "PROJECT.firebaseapp.com",
+  projectId: "PROJECT_ID",
+  appId: "APP_ID"
+};
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JomPool — Your City, On Demand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green: #8B5E3C;
+  --green-dark: #6B4226;
+  --green-light: #F5EDE5;
+  --black: #1A0F0A;
+  --white: #FFFFFF;
+  --gray-50: #F9F5F2;
+  --gray-100: #EDE5DE;
+  --gray-200: #D4C4B8;
+  --gray-500: #9C8070;
+  --gray-700: #4A3728;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--white);
+  color: var(--black);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ── SHARED ── */
+.section-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 0.8rem;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+}
+.section-desc {
+  font-size: 1rem;
+  color: var(--gray-700);
+  max-width: 460px;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 5%;
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--gray-100);
+  transition: box-shadow 0.3s;
+}
+.logo {
+  font-family: var(--font-display);
+  font-weight: 800; font-size: 1.45rem;
+  color: var(--black); letter-spacing: -0.02em; text-decoration: none;
+}
+.logo span { color: var(--green); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a {
+  font-size: 0.9rem; font-weight: 500;
+  color: var(--gray-700); text-decoration: none; transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--green); }
+.nav-cta { display: flex; gap: 0.7rem; align-items: center; }
+
+.btn-ghost {
+  padding: 0.5rem 1.2rem;
+  background: none; border: 1.5px solid var(--gray-200);
+  border-radius: 100px; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--black);
+  cursor: pointer; transition: border-color 0.2s;
+}
+.btn-ghost:hover { border-color: var(--black); }
+.btn-primary {
+  padding: 0.55rem 1.3rem;
+  background: var(--green); border: none; border-radius: 100px;
+  font-family: var(--font-body); font-size: 0.88rem; font-weight: 500;
+  color: var(--white); cursor: pointer; transition: background 0.2s, transform 0.1s;
+}
+.btn-primary:hover { background: var(--green-dark); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-large { padding: 0.9rem 2rem; font-size: 0.98rem; border-radius: 100px; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  padding: 7rem 5% 4rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem; align-items: center;
+  background: var(--gray-50);
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -20%; right: -10%;
+  width: 60vw; height: 80vh;
+  background: radial-gradient(circle at center, #8B5E3C18 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--green-light); color: var(--green-dark);
+  font-size: 0.78rem; font-weight: 500; padding: 0.35rem 0.9rem;
+  border-radius: 100px; margin-bottom: 1.5rem;
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 5vw, 4.5rem);
+  font-weight: 800; line-height: 1.06;
+  letter-spacing: -0.03em; margin-bottom: 1.4rem;
+}
+.hero-title .accent { color: var(--green); display: block; }
+.hero-desc { font-size: 1.05rem; color: var(--gray-700); max-width: 440px; margin-bottom: 2.5rem; line-height: 1.7; }
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem; }
+.hero-stats { display: flex; gap: 2.5rem; }
+.stat-num { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; letter-spacing: -0.02em; }
+.stat-label { font-size: 0.82rem; color: var(--gray-500); }
+
+/* Phone mockup */
+.hero-visual { position: relative; display: flex; justify-content: center; align-items: center; }
+.phone-frame {
+  width: 280px; height: 580px;
+  background: var(--black); border-radius: 42px; padding: 14px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.05);
+  position: relative; z-index: 2;
+  animation: float 5s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+.phone-screen {
+  width: 100%; height: 100%;
+  background: var(--white); border-radius: 30px;
+  overflow: hidden; position: relative;
+}
+.phone-status { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px 6px; font-size: 11px; font-weight: 600; }
+.app-header { padding: 0 16px 12px; background: var(--white); }
+.app-greeting { font-size: 11px; color: var(--gray-500); margin-bottom: 2px; }
+.app-name { font-family: var(--font-display); font-size: 16px; font-weight: 700; }
+.map-area { height: 180px; background: #F0E6DC; position: relative; overflow: hidden; }
+.map-roads {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(to right,rgba(255,255,255,.7) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.7) 1px,transparent 1px);
+  background-size: 30px 30px;
+}
+.map-pin {
+  position: absolute; top: 50%; left: 50%;
+  width: 28px; height: 28px; background: var(--green);
+  border-radius: 50% 50% 50% 0;
+  transform: translate(-50%,-50%) rotate(-45deg);
+  box-shadow: 0 3px 8px rgba(139,94,60,.4);
+}
+.map-car { position: absolute; top: 30%; left: 60%; font-size: 18px; animation: drive 4s linear infinite; }
+@keyframes drive { 0%{transform:translateX(0)} 100%{transform:translateX(-60px)} }
+.input-section { padding: 12px 16px; background: var(--white); }
+.input-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; background: var(--gray-50);
+  border-radius: 10px; margin-bottom: 8px;
+}
+.input-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.input-dot.green { background: var(--green); }
+.input-dot.red { background: #FF4444; }
+.input-text { font-size: 11px; color: var(--gray-700); }
+.services-row { display: flex; gap: 8px; padding: 8px 16px; overflow-x: auto; scrollbar-width: none; }
+.service-chip {
+  flex-shrink: 0; display: flex; align-items: center; gap: 5px;
+  padding: 7px 12px; background: var(--gray-50);
+  border-radius: 20px; font-size: 10px; font-weight: 500;
+}
+.service-chip.active { background: var(--green-light); color: var(--green-dark); }
+.service-icon { font-size: 14px; }
+.promo-card {
+  margin: 8px 16px; padding: 10px 12px;
+  background: linear-gradient(135deg, #8B5E3C 0%, #6B4226 100%);
+  border-radius: 12px; color: white; font-size: 10px;
+}
+.promo-title { font-weight: 600; margin-bottom: 2px; font-size: 11px; }
+.ride-btn {
+  margin: 8px 16px; width: calc(100% - 32px);
+  padding: 12px; background: var(--green); border: none;
+  border-radius: 12px; color: white; font-family: var(--font-body);
+  font-weight: 600; font-size: 13px; cursor: pointer; text-align: center;
+}
+.phone-bg-glow {
+  position: absolute; width: 300px; height: 300px;
+  background: radial-gradient(circle,rgba(139,94,60,.15) 0%,transparent 70%);
+  top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 1;
+}
+
+/* ── CARPOOL SECTION (NEW) ── */
+.carpool {
+  padding: 6rem 5%;
+  background: var(--white);
+}
+.carpool-inner {
+  display: grid; grid-template-columns: 1fr 1.4fr; gap: 5rem; align-items: start;
+}
+.mode-switch {
+  display: flex; gap: 0.5rem; margin-bottom: 2rem;
+  background: var(--gray-50); padding: 5px; border-radius: 100px;
+  width: fit-content;
+}
+.mode-btn {
+  padding: 0.55rem 1.4rem; border-radius: 100px; border: none;
+  font-family: var(--font-body); font-size: 0.88rem; font-weight: 500;
+  cursor: pointer; transition: all 0.25s; color: var(--gray-700); background: none;
+}
+.mode-btn.active { background: var(--green); color: var(--white); box-shadow: 0 2px 8px rgba(139,94,60,.25); }
+
+.trip-grid { display: grid; gap: 1rem; }
+.trip-card {
+  background: var(--gray-50); border: 1px solid var(--gray-100);
+  border-radius: 16px; padding: 1.2rem 1.4rem;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.trip-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.07); border-color: var(--gray-200); }
+.trip-route { font-family: var(--font-display); font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+.trip-meta { font-size: 0.82rem; color: var(--gray-500); display: flex; gap: 1rem; }
+.trip-meta span { display: flex; align-items: center; gap: 4px; }
+.trip-seats {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+}
+.seats-badge {
+  background: var(--green-light); color: var(--green-dark);
+  font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 100px;
+}
+.join-btn {
+  padding: 0.5rem 1.1rem; background: var(--green); border: none;
+  border-radius: 100px; font-family: var(--font-body); font-size: 0.82rem;
+  font-weight: 600; color: var(--white); cursor: pointer; transition: background 0.2s;
+}
+.join-btn:hover { background: var(--green-dark); }
+.join-btn:disabled { background: var(--gray-200); color: var(--gray-500); cursor: default; }
+
+.carpool-form-panel { background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 24px; padding: 2rem; }
+.carpool-form-panel h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; margin-bottom: 1.4rem; }
+.cp-label { font-size: 0.78rem; font-weight: 600; color: var(--gray-500); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.4rem; display: block; }
+.cp-input {
+  width: 100%; padding: 0.8rem 1rem;
+  background: var(--white); border: 1.5px solid var(--gray-200);
+  border-radius: 12px; font-family: var(--font-body); font-size: 0.92rem;
+  color: var(--black); outline: none; transition: border-color 0.2s;
+  margin-bottom: 1rem;
+}
+.cp-input:focus { border-color: var(--green); }
+.cp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.btn-submit {
+  width: 100%; padding: 0.9rem; background: var(--green);
+  border: none; border-radius: 14px; font-family: var(--font-body);
+  font-size: 0.95rem; font-weight: 600; color: var(--white);
+  cursor: pointer; transition: background 0.2s, transform 0.1s; margin-top: 0.4rem;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.btn-submit:hover { background: var(--green-dark); }
+.btn-submit:active { transform: scale(0.98); }
+
+/* empty state */
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--gray-500); font-size: 0.92rem; }
+.empty-state .icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+
+/* ── BOOKING ── */
+.booking {
+  padding: 6rem 5%; background: var(--black); color: var(--white);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+}
+.booking .section-tag { color: var(--green); }
+.booking .section-title { color: var(--white); }
+.booking .section-desc { color: rgba(255,255,255,.5); }
+.booking-form {
+  background: #141414; border-radius: 24px; padding: 2.2rem;
+  border: 1px solid rgba(255,255,255,.07);
+}
+.form-label { font-size: .78rem; font-weight: 500; color: var(--gray-500); letter-spacing: .06em; text-transform: uppercase; margin-bottom: .5rem; display: block; }
+.form-row { margin-bottom: 1.2rem; position: relative; }
+.form-input {
+  width: 100%; padding: .9rem 1.1rem .9rem 2.8rem;
+  background: #1E1E1E; border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px; font-family: var(--font-body); font-size: .95rem;
+  color: var(--white); transition: border-color .2s; outline: none;
+}
+.form-input::placeholder { color: rgba(255,255,255,.3); }
+.form-input:focus { border-color: var(--green); }
+.form-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-size: 1.1rem; pointer-events: none; }
+.divider-line { height: 1px; background: rgba(255,255,255,.06); margin: 1.4rem 0; }
+.ride-types { display: flex; gap: .7rem; margin-bottom: 1.4rem; }
+.ride-type {
+  flex: 1; padding: .8rem .5rem;
+  background: #1E1E1E; border: 1.5px solid rgba(255,255,255,.08);
+  border-radius: 12px; text-align: center; cursor: pointer; transition: all .2s;
+}
+.ride-type:hover { border-color: rgba(255,255,255,.2); }
+.ride-type.selected { border-color: var(--green); background: rgba(139,94,60,.1); }
+.ride-type-icon { font-size: 1.5rem; display: block; margin-bottom: 4px; }
+.ride-type-name { font-size: .75rem; font-weight: 500; color: rgba(255,255,255,.7); }
+.ride-type-price { font-size: .85rem; font-weight: 600; color: var(--white); }
+.btn-book {
+  width: 100%; padding: 1rem; background: var(--green);
+  border: none; border-radius: 14px; font-family: var(--font-body);
+  font-size: 1rem; font-weight: 600; color: var(--white); cursor: pointer;
+  transition: all .2s; display: flex; align-items: center; justify-content: center; gap: .5rem;
+}
+.btn-book:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+/* ── FEATURES ── */
+.features { padding: 6rem 5%; background: var(--gray-50); }
+.features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; margin-top: 3.5rem; }
+.feature-item {
+  padding: 2rem; background: var(--white);
+  border-radius: 20px; border: 1px solid var(--gray-100);
+  transition: box-shadow .3s, transform .2s;
+}
+.feature-item:hover { box-shadow: 0 8px 24px rgba(0,0,0,.06); transform: translateY(-3px); }
+.feature-icon {
+  width: 48px; height: 48px; background: var(--green-light);
+  border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; margin-bottom: 1.2rem;
+}
+.feature-title { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem; }
+.feature-desc { font-size: .88rem; color: var(--gray-500); line-height: 1.6; }
+
+/* ── DRIVER ── */
+.driver {
+  padding: 6rem 5%; background: var(--white);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+}
+.driver-visual {
+  background: linear-gradient(145deg,#F5EDE5 0%,#E8D5C4 100%);
+  border-radius: 28px; padding: 3rem; position: relative;
+  overflow: hidden; min-height: 380px;
+  display: flex; align-items: center; justify-content: center;
+}
+.big-emoji { font-size: 8rem; text-align: center; animation: float 5s ease-in-out infinite; }
+.driver-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+.driver-card { padding: 1.2rem; background: var(--gray-50); border-radius: 16px; text-align: center; }
+.driver-card-num { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: var(--green); display: block; }
+.driver-card-label { font-size: .8rem; color: var(--gray-500); }
+
+/* ── DOWNLOAD ── */
+.download {
+  padding: 6rem 5%; background: var(--black);
+  text-align: center; position: relative; overflow: hidden;
+}
+.download::before {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); width: 600px; height: 600px;
+  background: radial-gradient(circle,rgba(139,94,60,.12) 0%,transparent 65%);
+}
+.download h2 {
+  font-family: var(--font-display); font-size: clamp(2.2rem,4vw,3.5rem);
+  font-weight: 800; color: var(--white); letter-spacing: -0.03em;
+  margin-bottom: 1rem; position: relative;
+}
+.download p { color: rgba(255,255,255,.45); font-size: 1.05rem; max-width: 440px; margin: 0 auto 2.5rem; position: relative; }
+.store-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; }
+.store-btn {
+  display: flex; align-items: center; gap: .8rem;
+  padding: .9rem 1.6rem; background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12); border-radius: 14px;
+  color: var(--white); text-decoration: none; cursor: pointer; transition: all .2s;
+}
+.store-btn:hover { background: rgba(255,255,255,.12); transform: translateY(-2px); }
+.store-icon { font-size: 1.8rem; }
+.store-info { text-align: left; }
+.store-sub { font-size: .7rem; opacity: .5; }
+.store-name { font-weight: 600; font-size: .95rem; }
+
+/* ── FOOTER ── */
+footer { background: var(--black); border-top: 1px solid rgba(255,255,255,.05); padding: 3rem 5% 2rem; }
+.footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+.footer-logo { font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; color: var(--white); margin-bottom: .8rem; }
+.footer-logo span { color: var(--green); }
+.footer-desc { font-size: .85rem; color: rgba(255,255,255,.35); line-height: 1.6; }
+.footer-col-title { font-weight: 600; color: var(--white); font-size: .9rem; margin-bottom: 1rem; }
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+.footer-links a { font-size: .85rem; color: rgba(255,255,255,.35); text-decoration: none; transition: color .2s; }
+.footer-links a:hover { color: var(--green); }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,.05); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+.footer-copy { font-size: .82rem; color: rgba(255,255,255,.25); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.55); z-index: 200;
+  justify-content: center; align-items: center;
+  animation: fadeIn .2s ease;
+}
+.modal-overlay.open { display: flex; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.modal-box {
+  background: var(--white); border-radius: 24px; padding: 2.2rem;
+  width: 90%; max-width: 420px; position: relative;
+  animation: slideUp .3s ease;
+}
+@keyframes slideUp { from{transform:translateY(30px);opacity:0} to{transform:translateY(0);opacity:1} }
+.modal-icon { font-size: 2.8rem; margin-bottom: .8rem; text-align: center; }
+.modal-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; text-align: center; margin-bottom: .5rem; }
+.modal-desc { font-size: .92rem; color: var(--gray-500); text-align: center; margin-bottom: 1.5rem; line-height: 1.6; }
+.modal-close-btn { width: 100%; padding: .85rem; background: var(--green); border: none; border-radius: 14px; font-family: var(--font-body); font-size: .95rem; font-weight: 600; color: var(--white); cursor: pointer; }
+
+/* ── ANIMATIONS ── */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .hero { grid-template-columns: 1fr; padding-top: 6rem; }
+  .hero-visual { order: -1; }
+  .phone-frame { width: 220px; height: 440px; }
+  .booking { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .driver { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .carpool-inner { grid-template-columns: 1fr; gap: 3rem; }
+}
+@media (max-width: 600px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .hero-stats { gap: 1.5rem; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .cp-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <a href="#" class="logo">Jom<span>Pool</span></a>
+  <ul class="nav-links">
+    <li><a href="#carpool">Carpooling</a></li>
+    <li><a href="#booking">Book a Ride</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#driver">Drive with Us</a></li>
+    <li><a href="#download">Download</a></li>
+  </ul>
+  <div class="nav-cta">
+<button class="btn-ghost" onclick="openAuth('login')">Log In</button>
+<button class="btn-primary" onclick="openAuth('signup')">Sign Up Free</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow"><span class="dot"></span>Now available across Malaysia</div>
+    <h1 class="hero-title">Get there,<br><span class="accent">effortlessly.</span></h1>
+    <p class="hero-desc">Book a ride or share a trip — all from one super app. Fast, safe, and reliable in every city we operate.</p>
+    <div class="hero-actions">
+      <button class="btn-primary btn-large" onclick="document.getElementById('booking').scrollIntoView({behavior:'smooth'})">Book a Ride →</button>
+      <button class="btn-ghost btn-large" onclick="document.getElementById('carpool').scrollIntoView({behavior:'smooth'})">Share a Trip</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><div class="stat-num">50M+</div><div class="stat-label">Happy Riders</div></div>
+      <div class="stat-item"><div class="stat-num">120+</div><div class="stat-label">Cities</div></div>
+      <div class="stat-item"><div class="stat-num">4.9★</div><div class="stat-label">Avg Rating</div></div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="phone-bg-glow"></div>
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="phone-status"><span>9:41</span><span>●●●●</span></div>
+        <div class="app-header">
+          <div class="app-greeting">Good morning 👋</div>
+          <div class="app-name">Where to, Niesa?</div>
+        </div>
+        <div class="map-area">
+          <div class="map-roads"></div>
+          <div class="map-pin"></div>
+          <div class="map-car">🚗</div>
+        </div>
+        <div class="input-section">
+          <div class="input-row"><div class="input-dot green"></div><div class="input-text">Current Location</div></div>
+          <div class="input-row"><div class="input-dot red"></div><div class="input-text" style="color:#999;">Where are you going?</div></div>
+        </div>
+        <div class="services-row">
+          <div class="service-chip active"><span class="service-icon">🚗</span>Car</div>
+          <div class="service-chip"><span class="service-icon">🏍️</span>Bike</div>
+          <div class="service-chip"><span class="service-icon">🤝</span>Pool</div>
+        </div>
+        <div class="promo-card">
+          <div class="promo-title">🎉 30% off your next ride!</div>
+          <div>Use code: JOM30 · Expires Dec 2026</div>
+        </div>
+        <div class="ride-btn">Find a Driver →</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CARPOOL (merged from file 2) -->
+<section class="carpool" id="carpool">
+  <div class="carpool-inner">
+    <div>
+      <div class="section-tag">Carpooling</div>
+      <h2 class="section-title reveal">Share the ride,<br>split the cost.</h2>
+      <p class="section-desc reveal">Find people heading your way or offer your empty seats. Save money, reduce traffic, and make new connections.</p>
+
+      <div class="mode-switch" style="margin-bottom:2rem;">
+        <button class="mode-btn active" onclick="setCarpoolMode('passenger', this)">🧳 Find a Trip</button>
+        <button class="mode-btn" onclick="setCarpoolMode('driver', this)">🚗 Offer a Trip</button>
+      </div>
+
+      <!-- Passenger: available trips -->
+      <div id="cp-passenger">
+        <div class="trip-grid" id="trip-list">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
+      <!-- Driver: my posted trips -->
+      <div id="cp-driver" style="display:none;">
+        <div class="trip-grid" id="my-trips">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Form panel -->
+    <div class="carpool-form-panel reveal">
+      <!-- Passenger request form -->
+      <div id="form-passenger">
+        <h3>🔍 Request a Trip</h3>
+        <label class="cp-label">From</label>
+        <input class="cp-input" id="req-from" placeholder="e.g. Kuala Lumpur">
+        <label class="cp-label">To</label>
+        <input class="cp-input" id="req-to" placeholder="e.g. Penang">
+        <div class="cp-row">
+          <div>
+            <label class="cp-label">Date</label>
+            <input class="cp-input" id="req-date" type="date">
+          </div>
+          <div>
+            <label class="cp-label">Passengers</label>
+            <input class="cp-input" id="req-seats" type="number" min="1" max="4" placeholder="1">
+          </div>
+        </div>
+        <button class="btn-submit" onclick="requestTrip()">Send Trip Request →</button>
+      </div>
+
+      <!-- Driver post form -->
+      <div id="form-driver" style="display:none;">
+        <h3>📍 Post a Trip</h3>
+        <label class="cp-label">From</label>
+        <input class="cp-input" id="drv-from" placeholder="e.g. Kuala Lumpur">
+        <label class="cp-label">To</label>
+        <input class="cp-input" id="drv-to" placeholder="e.g. Johor Bahru">
+        <div class="cp-row">
+          <div>
+            <label class="cp-label">Departure Time</label>
+            <input class="cp-input" id="drv-time" placeholder="e.g. 8:00 AM">
+          </div>
+          <div>
+            <label class="cp-label">Seats Available</label>
+            <input class="cp-input" id="drv-seats" type="number" min="1" max="4" placeholder="3">
+          </div>
+        </div>
+        <label class="cp-label">Price per Seat (RM)</label>
+        <input class="cp-input" id="drv-price" type="number" placeholder="e.g. 25">
+        <button class="btn-submit" onclick="postTrip()">Post Trip →</button>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section class="booking" id="booking">
+  <div>
+    <div class="section-tag">Quick Booking</div>
+    <h2 class="section-title reveal">Book your ride<br>in 30 seconds</h2>
+    <p class="section-desc reveal">Enter your destination, pick your ride type, and you're off. A driver is always nearby.</p>
+    <div style="margin-top:2rem;display:flex;flex-direction:column;gap:1rem;">
+      <div style="display:flex;align-items:center;gap:1rem;" class="reveal">
+        <div style="width:36px;height:36px;background:rgba(139,94,60,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;">📍</div>
+        <div>
+          <div style="font-weight:500;color:white;font-size:.95rem;">Set your destination</div>
+          <div style="font-size:.82rem;color:rgba(255,255,255,.35);">Type any address or point of interest</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;" class="reveal">
+        <div style="width:36px;height:36px;background:rgba(139,94,60,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;">🚗</div>
+        <div>
+          <div style="font-weight:500;color:white;font-size:.95rem;">Choose your ride type</div>
+          <div style="font-size:.82rem;color:rgba(255,255,255,.35);">Economy, Premium, or Bike</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;" class="reveal">
+        <div style="width:36px;height:36px;background:rgba(139,94,60,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;">💳</div>
+        <div>
+          <div style="font-weight:500;color:white;font-size:.95rem;">Pay your way</div>
+          <div style="font-size:.82rem;color:rgba(255,255,255,.35);">Cash, card, or JomPool wallet</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="booking-form reveal">
+    <div class="form-row">
+      <label class="form-label">Pickup Location</label>
+      <div style="position:relative;">
+        <span class="form-icon">📍</span>
+        <input class="form-input" type="text" placeholder="Your current location">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Destination</label>
+      <div style="position:relative;">
+        <span class="form-icon">🎯</span>
+        <input class="form-input" type="text" placeholder="Where are you going?">
+      </div>
+    </div>
+    <div class="divider-line"></div>
+    <label class="form-label" style="margin-bottom:.8rem;display:block;">Select Ride Type</label>
+    <div class="ride-types">
+      <div class="ride-type selected" onclick="selectRide(this)">
+        <span class="ride-type-icon">🚗</span>
+        <div class="ride-type-name">Economy</div>
+        <div class="ride-type-price">RM5–10</div>
+      </div>
+      <div class="ride-type" onclick="selectRide(this)">
+        <span class="ride-type-icon">🏎️</span>
+        <div class="ride-type-name">Premium</div>
+        <div class="ride-type-price">RM20–30</div>
+      </div>
+      <div class="ride-type" onclick="selectRide(this)">
+        <span class="ride-type-icon">🏍️</span>
+        <div class="ride-type-name">Bike</div>
+        <div class="ride-type-price">RM4–8</div>
+      </div>
+    </div>
+    <div class="divider-line"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
+      <span style="font-size:.85rem;color:rgba(255,255,255,.4);">Estimated fare</span>
+      <span style="font-weight:600;color:var(--green);font-size:1.1rem;" id="fare-display">RM5 – RM10</span>
+    </div>
+    <button class="btn-book" id="book-btn" onclick="handleBooking()">Book a Ride →</button>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="reveal">
+    <div class="section-tag">Why JomPool</div>
+    <h2 class="section-title">Safe. Affordable.<br>Always on time.</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature-item reveal"><div class="feature-icon">🛡️</div><div class="feature-title">Verified Drivers</div><div class="feature-desc">Every driver is background-checked, trained, and regularly rated to ensure your safety.</div></div>
+    <div class="feature-item reveal"><div class="feature-icon">📡</div><div class="feature-title">Live GPS Tracking</div><div class="feature-desc">Track your ride in real time and share your trip status with friends and family.</div></div>
+    <div class="feature-item reveal"><div class="feature-icon">🚨</div><div class="feature-title">Emergency SOS</div><div class="feature-desc">One tap connects you to local emergency services and shares your location automatically.</div></div>
+    <div class="feature-item reveal"><div class="feature-icon">💳</div><div class="feature-title">Secure Payments</div><div class="feature-desc">Your payment data is encrypted end-to-end. Pay with card, cash, or our digital wallet.</div></div>
+    <div class="feature-item reveal"><div class="feature-icon">⭐</div><div class="feature-title">Transparent Ratings</div><div class="feature-desc">Both riders and drivers rate each trip, keeping our community honest and high-quality.</div></div>
+    <div class="feature-item reveal"><div class="feature-icon">🤝</div><div class="feature-title">Carpooling</div><div class="feature-desc">Share rides with fellow commuters, cut your fare in half, and reduce carbon on Malaysian roads.</div></div>
+  </div>
+</section>
+
+<!-- DRIVER -->
+<section class="driver" id="driver">
+  <div class="driver-visual"><div class="big-emoji">🚗</div></div>
+  <div>
+    <div class="section-tag">Drive with Us</div>
+    <h2 class="section-title reveal">Earn on your<br>own schedule</h2>
+    <p class="section-desc reveal">Join thousands of drivers earning flexible income. You choose when and where you drive.</p>
+    <div class="driver-cards reveal">
+      <div class="driver-card"><span class="driver-card-num">RM1,800</span><div class="driver-card-label">Avg monthly earnings</div></div>
+      <div class="driver-card"><span class="driver-card-num">2M+</span><div class="driver-card-label">Active driver partners</div></div>
+      <div class="driver-card"><span class="driver-card-num">100%</span><div class="driver-card-label">Flexible hours</div></div>
+      <div class="driver-card"><span class="driver-card-num">24/7</span><div class="driver-card-label">Driver support</div></div>
+    </div>
+    <div style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;" class="reveal">
+      <button class="btn-primary btn-large">Start Driving Today →</button>
+      <button class="btn-ghost btn-large">Learn More</button>
+    </div>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section class="download" id="download">
+  <h2 class="reveal">Get the app.<br>Ride instantly.</h2>
+  <p class="reveal">Download JomPool and get your first ride free. No strings attached.</p>
+  <div class="store-buttons reveal">
+    <a class="store-btn"><span class="store-icon">🍎</span><div class="store-info"><div class="store-sub">Download on the</div><div class="store-name">App Store</div></div></a>
+    <a class="store-btn"><span class="store-icon">🤖</span><div class="store-info"><div class="store-sub">Get it on</div><div class="store-name">Google Play</div></div></a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo">Jom<span>Pool</span></div>
+      <p class="footer-desc">The super app for Malaysia. Rides, carpooling, and more — all in one place.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Services</div>
+      <ul class="footer-links">
+        <li><a href="#">JomCar</a></li>
+        <li><a href="#">JomBike</a></li>
+        <li><a href="#">JomPool Carpool</a></li>
+        <li><a href="#">JomSend</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Newsroom</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Investors</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Support</div>
+      <ul class="footer-links">
+        <li><a href="#">Help Centre</a></li>
+        <li><a href="#">Safety</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 JomPool Sdn Bhd. All rights reserved.</div>
+    <div class="footer-copy">🇲🇾 Made in Malaysia</div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-icon" id="modal-icon">✅</div>
+    <div class="modal-title" id="modal-title">You're in!</div>
+    <div class="modal-desc" id="modal-desc">You've successfully joined this trip. The driver will contact you shortly.</div>
+    <button class="modal-close-btn" onclick="closeModal()">Got it!</button>
+  </div>
+</div>
+
+<script>
+/* ─── CARPOOL DATA ─── */
+let trips = [
+  { from: 'Kuala Lumpur', to: 'Penang', time: '5:00 PM', seats: 3, price: 40 },
+  { from: 'KL Sentral', to: 'Johor Bahru', time: '8:00 AM', seats: 2, price: 55 },
+  { from: 'Petaling Jaya', to: 'Ipoh', time: '7:30 AM', seats: 1, price: 30 },
+  { from: 'Cyberjaya', to: 'Melaka', time: '2:00 PM', seats: 3, price: 25 },
+];
+
+let carpoolMode = 'passenger';
+
+function setCarpoolMode(mode, btn) {
+  carpoolMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cp-passenger').style.display = mode === 'passenger' ? 'block' : 'none';
+  document.getElementById('cp-driver').style.display = mode === 'driver' ? 'block' : 'none';
+  document.getElementById('form-passenger').style.display = mode === 'passenger' ? 'block' : 'none';
+  document.getElementById('form-driver').style.display = mode === 'driver' ? 'block' : 'none';
+  renderTrips();
+}
+
+function renderTrips() {
+  // Passenger view
+  const list = document.getElementById('trip-list');
+  if (trips.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="icon">🔍</div>No trips available yet. Check back soon!</div>`;
+  } else {
+    list.innerHTML = trips.map((t, i) => `
+      <div class="trip-card" id="card-${i}">
+        <div>
+          <div class="trip-route">${t.from} → ${t.to}</div>
+          <div class="trip-meta">
+            <span>🕐 ${t.time}</span>
+            <span>💰 RM${t.price}/seat</span>
+          </div>
+        </div>
+        <div class="trip-seats">
+          <span class="seats-badge">${t.seats} seat${t.seats !== 1 ? 's' : ''} left</span>
+          <button class="join-btn" ${t.seats === 0 ? 'disabled' : ''} onclick="joinTrip(${i})" id="join-${i}">
+            ${t.seats === 0 ? 'Full' : 'Join'}
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Driver view
+  const myTrips = document.getElementById('my-trips');
+  myTrips.innerHTML = trips.map(t => `
+    <div class="trip-card">
+      <div>
+        <div class="trip-route">${t.from} → ${t.to}</div>
+        <div class="trip-meta"><span>🕐 ${t.time}</span><span>💰 RM${t.price}/seat</span></div>
+      </div>
+      <div class="trip-seats">
+        <span class="seats-badge">${t.seats} seats left</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function joinTrip(i) {
+  if (trips[i].seats > 0) {
+    trips[i].seats--;
+    renderTrips();
+    showModal('✅', 'You\'re in!', `Joined the trip from <strong>${trips[i].from}</strong> to <strong>${trips[i].to}</strong> at ${trips[i].time}. The driver will contact you shortly.`);
+  }
+}
+
+function postTrip() {
+  const from = document.getElementById('drv-from').value.trim();
+  const to = document.getElementById('drv-to').value.trim();
+  const time = document.getElementById('drv-time').value.trim();
+  const seats = parseInt(document.getElementById('drv-seats').value) || 1;
+  const price = parseInt(document.getElementById('drv-price').value) || 0;
+
+  if (!from || !to || !time) {
+    alert('Please fill in From, To, and Time fields.');
+    return;
+  }
+
+  trips.unshift({ from, to, time, seats, price });
+  ['drv-from','drv-to','drv-time','drv-seats','drv-price'].forEach(id => document.getElementById(id).value = '');
+
+  renderTrips();
+
+  // ✅ NEW: notification when driver posts trip
+  showNotification(`🚗 Passenger requests available for ${from} → ${to}`);
+
+  showModal('🚗', 'Trip Posted!', `Your trip from <strong>${from}</strong> to <strong>${to}</strong> at ${time} is now live.`);
+}
+
+function requestTrip() {
+  const from = document.getElementById('req-from').value.trim();
+  const to = document.getElementById('req-to').value.trim();
+  if (!from || !to) { alert('Please enter From and To locations.'); return; }
+  showModal('📨', 'Request Sent!', `We\'re looking for drivers heading from <strong>${from}</strong> to <strong>${to}</strong>. You\'ll be notified when a match is found.`);
+  document.getElementById('req-from').value = '';
+  document.getElementById('req-to').value = '';
+}
+
+/* ─── BOOKING ─── */
+function selectRide(el) {
+  document.querySelectorAll('.ride-type').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  const prices = ['RM5 – RM10', 'RM20 – RM30', 'RM4 – RM8'];
+  const idx = Array.from(document.querySelectorAll('.ride-type')).indexOf(el);
+  document.getElementById('fare-display').textContent = prices[idx];
+}
+
+function handleBooking() {
+  const btn = document.getElementById('book-btn');
+  btn.innerHTML = 'Finding your driver... 🔍';
+  btn.style.pointerEvents = 'none';
+  setTimeout(() => {
+    btn.innerHTML = '✓ Driver found! ETA 3 min';
+    btn.style.background = '#00A855';
+  }, 2000);
+  setTimeout(() => {
+    btn.innerHTML = 'Book a Ride →';
+    btn.style.background = 'var(--green)';
+    btn.style.pointerEvents = '';
+  }, 5000);
+}
+
+/* ─── MODAL ─── */
+function showModal(icon, title, desc) {
+  document.getElementById('modal-icon').textContent = icon;
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-desc').innerHTML = desc;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+/* ─── SCROLL REVEAL ─── */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ─── NAV SHADOW ─── */
+window.addEventListener('scroll', () => {
+  document.querySelector('nav').style.boxShadow = window.scrollY > 50 ? '0 2px 20px rgba(0,0,0,.08)' : 'none';
+});
+
+/* ─── INIT ─── */
+renderTrips();
+function openAuth(type){
+
+  if(type === "login" || type === "signup") {
+    showModal("🔐", "Loading...", "Redirecting to login...");}
+}
+// NOTIFICATION SYSTEM
+function showNotification(msg){
+  const n = document.getElementById("notif");
+  n.innerHTML = msg;
+  n.style.display = "block";
+  setTimeout(() => {
+    n.style.display = "none";
+  }, 4000);
+}
+// 🔥 Firebase Config (ambil dari Firebase Console)
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// Init Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Auth object
+const auth = firebase.auth();
+
+
+// Apple Provider (Sign in with Apple)
+const appleProvider = new firebase.auth.OAuthProvider('apple.com');
+</script>
+</body>
+</html><!DOCTYPE HTML>
+
+<html>
+
+<head>
+  <title>Untitled</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
